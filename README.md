@@ -1,5 +1,8 @@
 # pi-claude-effort
 
+[![CI](https://github.com/vladola/pi-claude-effort/actions/workflows/ci.yml/badge.svg)](https://github.com/vladola/pi-claude-effort/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/v/release/vladola/pi-claude-effort)](https://github.com/vladola/pi-claude-effort/releases/latest)
+
 A [Pi](https://pi.dev) extension: **Claude models default to one thinking level below their maximum** — `xhigh` for current models — and a level you pick by hand is remembered per model.
 
 No settings file to edit. No model list to maintain. New Claude models and new Claude providers get the default automatically.
@@ -83,9 +86,13 @@ pi --mode rpc --no-session -ne -e ./extensions/index.ts --model anthropic/claude
 ## Requirements
 
 - Pi with extension and thinking-level support (`@earendil-works/pi-coding-agent` and `@earendil-works/pi-ai` as peers)
-- Node.js 20+
+- Node.js 22.19+
 
 No runtime dependencies.
+
+## Versioning
+
+Releases are automated from [Conventional Commits](https://www.conventionalcommits.org/): a `fix:` bumps the patch, a `feat:` the minor, and a `!`/`BREAKING CHANGE` the major version. CI must pass first; then `semantic-release` tags `vX.Y.Z`, writes `CHANGELOG.md`, and publishes a GitHub release. `chore:`, `ci:`, `docs:`, and `test:` commits do not cut a release.
 
 ## License
 

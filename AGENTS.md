@@ -8,6 +8,9 @@ maximum, while remembering a level the user selected by hand.
 | Path | Purpose |
 |---|---|
 | `extensions/index.ts` | Pi entry point: event wiring, command, precedence |
+| `.github/workflows/ci.yml` | Tests and typecheck on pull requests and `main` |
+| `.github/workflows/release.yml` | `semantic-release` on every push to `main` |
+| `.releaserc.json` | Release plugins: changelog, version commit, tag, GitHub release |
 | `src/policy.ts` | Pure policy: Claude detection, supported levels, max-1, target resolution |
 | `src/argv.ts` | Detects an explicit `--thinking` / `model:level` on the command line |
 | `src/overrides.ts` | Per-model override store (`<agent-dir>/claude-effort.json`) |
@@ -39,6 +42,11 @@ maximum, while remembering a level the user selected by hand.
   `resolveTarget()` is the single place that encodes it. An explicit
   `--thinking` (or `model:level`) on the command line makes the extension stand
   down for the whole process (`src/argv.ts`) — never restore it silently.
+- **Commits are Conventional Commits.** `semantic-release` derives the version
+  from them: `fix` → patch, `feat` → minor, `feat!`/`BREAKING CHANGE` → major.
+  `chore`, `ci`, `docs`, `test`, `build` do not cut a release. Never hand-edit
+  `version` in `package.json` or the top of `CHANGELOG.md`; the release job owns
+  both.
 
 ## Behavior notes
 
@@ -81,9 +89,24 @@ Override checks in the same sandbox:
 
 ## Release
 
-1. Update `CHANGELOG.md` and `package.json` version (semver).
-2. `npm test && npm run typecheck`.
-3. Commit, tag (`vX.Y.Z`), push.
-4. `npm publish` only when explicitly asked; the git install path
-   (`pi install git:github.com/vladola/pi-claude-effort@main`) is the supported
-   distribution channel otherwise.
+Fully automated on `main` by `.github/workflows/release.yml`. Do not tag, bump
+`package.json`, or edit `CHANGELOG.md` by hand.
+
+1. Merge a change to `main` with a Conventional Commit subject.
+2. CI runs the tests; `semantic-release` then computes the next semver from the
+   commits since the last `vX.Y.Z` tag and, if the change is releasable:
+   - writes the version to `package.json` + `package-lock.json`,
+   - prepends the entry to `CHANGELOG.md`,
+   - commits `chore(release): X.Y.Z [skip ci]`,
+   - tags `vX.Y.Z`, pushes, and publishes a GitHub release.
+3. Nothing is published to npm (`npmPublish: false`). The supported channel is
+   `pi install git:github.com/vladola/pi-claude-effort@main`.
+
+A commit that is not releasable (`chore`, `ci`, `docs`, `test`) leaves the
+version alone; the job exits successfully.
+
+Dry run locally (needs a token, creates nothing):
+
+```sh
+GITHUB_TOKEN=$(gh auth token) npm run release:dry
+```
