@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/vladola/pi-claude-effort/compare/v0.1.0...v0.2.0) (2026-10-23)
+
+
+### Features
+
+* automate semantic versioning releases ([0d0b1fe](https://github.com/vladola/pi-claude-effort/commit/0d0b1fe977eaadb84b4344b4a049d86323f05fdc))
+
 # Changelog
 
 ## 0.1.0
